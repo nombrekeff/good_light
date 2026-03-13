@@ -300,8 +300,8 @@ export function redraw(canvas, ctx, solar, skyRingCache) {
   ctx.beginPath();
   ctx.moveTo(cx, cy);
   ctx.lineTo(dotX, dotY);
-  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-  ctx.lineWidth   = 1;
+  ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+  ctx.lineWidth   = 1.5;
   ctx.stroke();
 
   // Glow halo around dot
@@ -322,6 +322,22 @@ export function redraw(canvas, ctx, solar, skyRingCache) {
 
   // Centre sky circle
   drawCentre(ctx, cx, cy, innerR * 0.92, nowMin, t, solar);
+
+  // Current-time clock overlay in centre
+  const centreR  = innerR * 0.92;
+  const hh       = String(now.getHours()).padStart(2, '0');
+  const mm       = String(now.getMinutes()).padStart(2, '0');
+  const timeStr  = `${hh}:${mm}`;
+  const fontSize = Math.max(10, Math.round(centreR * 0.44)); // ~44% of centre radius
+  ctx.save();
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor  = 'rgba(0,0,0,0.7)';
+  ctx.shadowBlur   = 10;
+  ctx.font         = `300 ${fontSize}px 'Cormorant Garamond', Georgia, serif`;
+  ctx.fillStyle    = 'rgba(255,255,255,0.82)';
+  ctx.fillText(timeStr, cx, cy + centreR * 0.34); // lower third of centre circle
+  ctx.restore();
 
   return skyRingCache;
 }
