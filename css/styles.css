@@ -8,7 +8,7 @@
   --blue-light:   #88aae0;
   --text:         #ddd8cc;
   --text-dim:     #7888a4;
-  --text-dimmer:  #3a4560;
+  --text-dimmer:  #5a6a88;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
