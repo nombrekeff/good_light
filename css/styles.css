@@ -1,0 +1,223 @@
+:root {
+  --bg:           #070c18;
+  --surface:      #0e1828;
+  --border:       rgba(255,255,255,0.06);
+  --gold:         #e8a840;
+  --gold-light:   #f0c870;
+  --blue-hr:      #5880d0;
+  --blue-light:   #88aae0;
+  --text:         #ddd8cc;
+  --text-dim:     #7888a4;
+  --text-dimmer:  #3a4560;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Montserrat', system-ui, sans-serif;
+  font-weight: 300;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100%;
+  padding: 28px 16px 56px;
+  gap: 22px;
+}
+
+/* ── Loading ── */
+#loading {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  z-index: 100;
+  transition: opacity 0.7s ease;
+}
+#loading.hidden { opacity: 0; pointer-events: none; }
+
+.loader-dot {
+  width: 10px; height: 10px;
+  background: var(--gold);
+  border-radius: 50%;
+  animation: blink 1.4s ease-in-out infinite;
+}
+.loader-text {
+  font-size: 0.7rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+@keyframes blink {
+  0%,100% { opacity: 0.2; transform: scale(0.7); }
+  50%      { opacity: 1;   transform: scale(1.3); }
+}
+
+/* ── Header ── */
+header { text-align: center; }
+
+.title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2.4rem, 9vw, 4.8rem);
+  font-weight: 300;
+  letter-spacing: 0.34em;
+  line-height: 1;
+  color: var(--text);
+}
+.title span { color: var(--gold); }
+
+.tagline {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-top: 7px;
+}
+
+#location-name {
+  font-size: 0.7rem;
+  color: var(--text-dimmer);
+  margin-top: 8px;
+  letter-spacing: 0.08em;
+  min-height: 1em;
+}
+
+/* ── Canvas ── */
+#wheel { display: block; cursor: crosshair; }
+
+/* ── Tooltip ── */
+#ring-tooltip {
+  position: fixed;
+  background: rgba(14,24,40,0.92);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 11px;
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  color: var(--text);
+  pointer-events: none;
+  display: none;
+  z-index: 50;
+  backdrop-filter: blur(4px);
+}
+
+/* ── Quality section ── */
+.quality-section {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  min-height: 80px;
+}
+
+#quality-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition: color 1.2s ease;
+}
+#quality-label.golden    { color: var(--gold); }
+#quality-label.blue-hour { color: var(--blue-light); }
+#quality-label.day       { color: #90b8d8; }
+#quality-label.harsh     { color: #c8a090; }
+#quality-label.night     { color: var(--text-dimmer); }
+
+#sun-times {
+  font-size: 0.62rem;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+}
+#next-event {
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-dimmer);
+  min-height: 1em;
+}
+
+/* ── Schedule cards ── */
+.schedule {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  max-width: 520px;
+}
+@media (min-width: 540px) {
+  .schedule { grid-template-columns: repeat(4, 1fr); }
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 15px 10px 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.7s, background 0.7s, box-shadow 0.7s;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: 14px 14px 0 0;
+  background: transparent;
+  transition: background 0.7s;
+}
+.card.active-gold {
+  border-color: rgba(232,168,64,0.3);
+  background: rgba(232,168,64,0.04);
+  box-shadow: 0 0 24px rgba(232,168,64,0.08);
+}
+.card.active-gold::before {
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.card.active-blue {
+  border-color: rgba(88,128,208,0.3);
+  background: rgba(88,128,208,0.04);
+  box-shadow: 0 0 24px rgba(88,128,208,0.09);
+}
+.card.active-blue::before {
+  background: linear-gradient(90deg, transparent, var(--blue-light), transparent);
+}
+
+.card-icon   { font-size: 1.25rem; line-height: 1; }
+.card-period { font-size: 0.54rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-dimmer); }
+.card-type   { font-size: 0.57rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500; }
+.card-type.gold { color: var(--gold); }
+.card-type.blue { color: var(--blue-light); }
+.card-time   { font-family: 'Cormorant Garamond', serif; font-size: 0.92rem; letter-spacing: 0.04em; color: var(--text); white-space: nowrap; }
+.card-dur    { font-size: 0.56rem; color: var(--text-dimmer); }
+
+/* ── Footer ── */
+footer { font-size: 0.58rem; letter-spacing: 0.1em; color: var(--text-dimmer); opacity: 0.5; text-align: center; }
+
+/* ── Error banner ── */
+#error-banner {
+  display: none;
+  background: rgba(180,60,40,0.12);
+  border: 1px solid rgba(180,60,40,0.25);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  color: #d09080;
+  text-align: center;
+  max-width: 520px;
+  width: 100%;
+}
