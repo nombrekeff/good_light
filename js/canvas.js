@@ -289,7 +289,7 @@ export function redraw(canvas, ctx, solar, skyRingCache) {
     solar.sunset, solar.civilEnd, '#4468d0', bPulse);
 
   // Hour tick marks + labels
-  const majorSz = sz * 0.022;
+  const majorSz = sz * 0.032;
   for (let h = 0; h < 24; h++) {
     const angle = RING_START + (h / 24) * TAU;
     const isMaj = h % 6 === 0;
@@ -305,7 +305,7 @@ export function redraw(canvas, ctx, solar, skyRingCache) {
     if (isMaj) {
       const lr = outerR + 23;
       ctx.font         = `${majorSz}px Montserrat, sans-serif`;
-      ctx.fillStyle    = 'rgba(200,195,185,0.45)';
+      ctx.fillStyle    = 'rgba(200,195,185,0.75)';
       ctx.textAlign    = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(
