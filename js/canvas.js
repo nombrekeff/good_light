@@ -246,6 +246,30 @@ export function drawCentre(ctx, cx, cy, r, nowMins, t, solar) {
   ctx.stroke();
 }
 
+// ── Animated full-canvas sky background ───────────────────
+export function drawBackground(ctx, cx, cy, sz, nowMin, t, solar) {
+  const status = getLightStatus(nowMin, solar);
+
+  const bgCol = {
+    golden:      ['#c87820', '#80200a'],
+    'blue-hour': ['#3858b0', '#08186a'],
+    day:         ['#4890c0', '#1050a0'],
+    harsh:       ['#80a0c0', '#2860a8'],
+    night:       ['#0c1420', '#020608'],
+  }[status.cls] || ['#0c1420', '#020608'];
+
+  const g = ctx.createRadialGradient(cx, cy * 0.4, sz * 0.05, cx, cy, sz * 0.75);
+  g.addColorStop(0, bgCol[0]);
+  g.addColorStop(1, bgCol[1]);
+
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, sz, sz);
+
+  if (status.cls === 'night') {
+    drawStars(ctx, cx, cy, sz * 0.72, t);
+  }
+}
+
 // ── Main draw function ────────────────────────────────────
 // Returns the (potentially newly built) skyRingCache.
 export function redraw(canvas, ctx, solar, skyRingCache) {
@@ -259,13 +283,14 @@ export function redraw(canvas, ctx, solar, skyRingCache) {
   const innerR = cx * 0.525;
   const t      = performance.now();
 
+  // Compute current time upfront (needed for background animation)
+  const now    = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+
   ctx.clearRect(0, 0, sz, sz);
 
-  // Dark backing disc
-  ctx.beginPath();
-  ctx.arc(cx, cy, outerR + 2, 0, TAU);
-  ctx.fillStyle = '#040810';
-  ctx.fill();
+  // Animated sky background across the full canvas
+  drawBackground(ctx, cx, cy, sz, nowMin, t, solar);
 
   // Sky ring (static, cached)
   if (!skyRingCache) skyRingCache = buildSkyRing(solar, canvas);
@@ -319,8 +344,6 @@ export function redraw(canvas, ctx, solar, skyRingCache) {
   }
 
   // Current-time needle + dot
-  const now    = new Date();
-  const nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
   const nowAng = RING_START + (nowMin / 1440) * TAU;
   const dotR   = (outerR + innerR) / 2;
   const dotX   = cx + dotR * Math.cos(nowAng);
