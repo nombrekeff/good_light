@@ -82,19 +82,46 @@ export function buildSkyRing(s, canvas) {
   const cx = sz / 2, cy = sz / 2;
   const outerR = cx * 0.865;
   const innerR = cx * 0.525;
-  const SEG = 720; // 2-minute resolution (720 segments × 2 min = 1440 min/day)
 
-  for (let i = 0; i < SEG; i++) {
-    const mins = (i / SEG) * 1440;
-    const a1 = RING_START + (i / SEG) * TAU;
-    const a2 = RING_START + ((i + 1) / SEG) * TAU;
-
+  if (typeof oc2.createConicGradient === 'function') {
+    // Native conic gradient: perfectly smooth, no banding, hardware-accelerated.
+    // Pre-sample one stop per minute (1440 stops) so the eased colour curve is
+    // faithfully captured; the browser linearly interpolates between stops.
+    const STOPS = 1440;
+    const grad = oc2.createConicGradient(RING_START, cx, cy);
+    for (let i = 0; i <= STOPS; i++) {
+      const offset = Math.min(i / STOPS, 1);
+      grad.addColorStop(offset, getSkyColor(offset * 1440, s));
+    }
+    // Fill the full outer disc, then punch out the inner hole.
     oc2.beginPath();
-    oc2.arc(cx, cy, outerR, a1, a2);
-    oc2.arc(cx, cy, innerR, a2, a1, true);
-    oc2.closePath();
-    oc2.fillStyle = getSkyColor(mins, s);
+    oc2.arc(cx, cy, outerR, 0, TAU);
+    oc2.fillStyle = grad;
     oc2.fill();
+    try {
+      oc2.globalCompositeOperation = 'destination-out';
+      oc2.beginPath();
+      oc2.arc(cx, cy, innerR, 0, TAU);
+      oc2.fill();
+    } finally {
+      oc2.globalCompositeOperation = 'source-over';
+    }
+  } else {
+    // Fallback for browsers without createConicGradient: use 1-minute resolution
+    // segments (1440 segments) to minimise visible stepping.
+    const SEG = 1440;
+    for (let i = 0; i < SEG; i++) {
+      const mins = (i / SEG) * 1440;
+      const a1 = RING_START + (i / SEG) * TAU;
+      const a2 = RING_START + ((i + 1) / SEG) * TAU;
+
+      oc2.beginPath();
+      oc2.arc(cx, cy, outerR, a1, a2);
+      oc2.arc(cx, cy, innerR, a2, a1, true);
+      oc2.closePath();
+      oc2.fillStyle = getSkyColor(mins, s);
+      oc2.fill();
+    }
   }
   return oc;
 }
