@@ -23,9 +23,12 @@ export function setActive(id, type, active) {
 }
 
 // ── UI update (called every animation frame) ──────────────
-export function updateUI(solar) {
-  const now  = new Date();
-  const mins = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+export function updateUI(solar, displayMins) {
+  if (displayMins === null || displayMins === undefined) {
+    const now = new Date();
+    displayMins = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+  }
+  const mins = displayMins;
   const st   = getLightStatus(mins, solar);
   const ql   = document.getElementById('quality-label');
 
