@@ -138,6 +138,7 @@ export function drawGlowArc(ctx, cx, cy, outerR, innerR, startM, endM, color, al
   ctx.shadowBlur  = wid * 1.2;
   ctx.shadowColor = color;
   ctx.globalAlpha = alpha;
+  ctx.lineCap     = 'round';
   ctx.beginPath();
   ctx.arc(cx, cy, midR, a1, a2);
   ctx.lineWidth   = wid * 0.45;
