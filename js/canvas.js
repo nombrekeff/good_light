@@ -252,7 +252,10 @@ export function redraw(canvas, ctx, solar, skyRingCache) {
   if (!solar) return skyRingCache;
   const sz = canvas.width;
   const cx = sz / 2, cy = sz / 2;
-  const outerR = cx * 0.865;
+  const majorSz = sz * 0.032;
+  // Ensure cardinal hour labels (placed at outerR + 23) fit within the canvas
+  // on small mobile screens by shrinking the ring just enough.
+  const outerR = Math.min(cx * 0.865, cx - 24 - majorSz * 0.5);
   const innerR = cx * 0.525;
   const t      = performance.now();
 
@@ -289,7 +292,6 @@ export function redraw(canvas, ctx, solar, skyRingCache) {
     solar.sunset, solar.civilEnd, '#4468d0', bPulse);
 
   // Hour tick marks + labels
-  const majorSz = sz * 0.032;
   for (let h = 0; h < 24; h++) {
     const angle = RING_START + (h / 24) * TAU;
     const isMaj = h % 6 === 0;
