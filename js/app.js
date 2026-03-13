@@ -20,12 +20,19 @@ let animId       = null;   // animation frame id
 
 // ── Canvas sizing ─────────────────────────────────────────
 function resize() {
+  const dpr = window.devicePixelRatio || 1;
   const s = Math.min(window.innerWidth - 32, 520);
-  canvas.width  = s;
-  canvas.height = s;
+  // Set CSS display size (layout unchanged)
+  canvas.style.width  = s + 'px';
+  canvas.style.height = s + 'px';
+  // Set buffer size at native device resolution for crisp HiDPI rendering
+  canvas.width  = Math.round(s * dpr);
+  canvas.height = Math.round(s * dpr);
   skyRingCache  = null;   // invalidate cache
-  bgCanvas.width  = window.innerWidth;
-  bgCanvas.height = window.innerHeight;
+  bgCanvas.style.width  = window.innerWidth  + 'px';
+  bgCanvas.style.height = window.innerHeight + 'px';
+  bgCanvas.width  = Math.round(window.innerWidth  * dpr);
+  bgCanvas.height = Math.round(window.innerHeight * dpr);
 }
 resize();
 window.addEventListener('resize', () => {
