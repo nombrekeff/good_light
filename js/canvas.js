@@ -290,9 +290,6 @@ export function redraw(canvas, ctx, solar, skyRingCache, nowMin, t) {
 
   ctx.clearRect(0, 0, sz, sz);
 
-  // Animated sky background across the full canvas
-  drawBackground(ctx, cx, cy, sz, sz, nowMin, t, solar);
-
   // Sky ring (static, cached)
   if (!skyRingCache) skyRingCache = buildSkyRing(solar, canvas);
   ctx.drawImage(skyRingCache, 0, 0);
