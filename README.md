@@ -12,6 +12,10 @@ A creative web app that tells you the **best hours for photography** based on yo
 - 🔢 **Countdown** — shows how long until the next best light window
 - 🌍 **Fallback** — if location is denied, defaults to London so the app is always functional
 
+## Screenshot
+
+![Good Light app screenshot showing the light wheel, schedule cards, and current light quality for London](assets/screenshot.png)
+
 ## Live demo
 
 Deployed to GitHub Pages: [https://nombrekeff.github.io/good_light/](https://nombrekeff.github.io/good_light/)
