@@ -201,7 +201,7 @@ header { text-align: center; }
 .card-type   { font-size: 0.57rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500; }
 .card-type.gold { color: var(--gold); }
 .card-type.blue { color: var(--blue-light); }
-.card-time   { font-family: 'Playfair Display', serif; font-size: 0.92rem; letter-spacing: 0.04em; color: var(--text); white-space: nowrap; }
+.card-time   { font-family: 'Playfair Display', serif; font-size: clamp(0.65rem, 2vw, 0.92rem); letter-spacing: 0.04em; color: var(--text); }
 .card-dur    { font-size: 0.56rem; color: var(--text-dimmer); }
 
 /* ── Footer ── */
