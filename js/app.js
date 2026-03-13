@@ -57,7 +57,7 @@ function animate() {
   const t      = performance.now();
   // Use the pinned time while the user is dragging; fall back to live current time.
   const displayMins = pinMins !== null ? pinMins : nowMin;
-  skyRingCache = redraw(canvas, ctx, solar, skyRingCache, displayMins, t);
+  skyRingCache = redraw(canvas, ctx, solar, skyRingCache, displayMins, t, isDragging);
   drawBgCanvas(displayMins, t);
   updateUI(solar, displayMins);
   animId = requestAnimationFrame(animate);
