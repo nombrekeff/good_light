@@ -4,11 +4,13 @@
    ========================================================= */
 
 import { fetchSolar, getLocationName, getLightStatus } from './solar.js';
-import { redraw, RING_START, TAU } from './canvas.js';
+import { redraw, drawBackground, RING_START, TAU } from './canvas.js';
 import { updateUI, populateCards, showError } from './ui.js';
 
 const canvas  = document.getElementById('wheel');
 const ctx     = canvas.getContext('2d');
+const bgCanvas = document.getElementById('bg');
+const bgCtx    = bgCanvas.getContext('2d');
 const tooltip = document.getElementById('ring-tooltip');
 
 // ── State ─────────────────────────────────────────────────
@@ -22,6 +24,8 @@ function resize() {
   canvas.width  = s;
   canvas.height = s;
   skyRingCache  = null;   // invalidate cache
+  bgCanvas.width  = window.innerWidth;
+  bgCanvas.height = window.innerHeight;
 }
 resize();
 window.addEventListener('resize', () => {
@@ -30,8 +34,20 @@ window.addEventListener('resize', () => {
 });
 
 // ── Animation loop ────────────────────────────────────────
+function drawBgCanvas(nowMin, t) {
+  const w  = bgCanvas.width;
+  const h  = bgCanvas.height;
+  const cx = w / 2, cy = h / 2;
+  bgCtx.clearRect(0, 0, w, h);
+  drawBackground(bgCtx, cx, cy, w, h, nowMin, t, solar);
+}
+
 function animate() {
-  skyRingCache = redraw(canvas, ctx, solar, skyRingCache);
+  const now    = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+  const t      = performance.now();
+  skyRingCache = redraw(canvas, ctx, solar, skyRingCache, nowMin, t);
+  drawBgCanvas(nowMin, t);
   updateUI(solar);
   animId = requestAnimationFrame(animate);
 }

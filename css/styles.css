@@ -15,8 +15,10 @@
 
 html, body { height: 100%; }
 
+html { background: var(--bg); }
+
 body {
-  background: var(--bg);
+  background: transparent;
   color: var(--text);
   font-family: 'Montserrat', system-ui, sans-serif;
   font-weight: 300;
@@ -26,6 +28,16 @@ body {
   min-height: 100%;
   padding: 28px 16px 56px;
   gap: 22px;
+}
+
+/* ── Background canvas ── */
+#bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
 }
 
 /* ── Loading ── */

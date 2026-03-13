@@ -247,7 +247,7 @@ export function drawCentre(ctx, cx, cy, r, nowMins, t, solar) {
 }
 
 // ── Animated full-canvas sky background ───────────────────
-export function drawBackground(ctx, cx, cy, sz, nowMin, t, solar) {
+export function drawBackground(ctx, cx, cy, w, h, nowMin, t, solar) {
   const status = getLightStatus(nowMin, solar);
 
   const bgCol = {
@@ -258,12 +258,13 @@ export function drawBackground(ctx, cx, cy, sz, nowMin, t, solar) {
     night:       ['#0c1420', '#020608'],
   }[status.cls] || ['#0c1420', '#020608'];
 
+  const sz = Math.max(w, h);
   const g = ctx.createRadialGradient(cx, cy * 0.4, sz * 0.05, cx, cy, sz * 0.75);
   g.addColorStop(0, bgCol[0]);
   g.addColorStop(1, bgCol[1]);
 
   ctx.fillStyle = g;
-  ctx.fillRect(0, 0, sz, sz);
+  ctx.fillRect(0, 0, w, h);
 
   if (status.cls === 'night') {
     drawStars(ctx, cx, cy, sz * 0.72, t);
@@ -272,7 +273,7 @@ export function drawBackground(ctx, cx, cy, sz, nowMin, t, solar) {
 
 // ── Main draw function ────────────────────────────────────
 // Returns the (potentially newly built) skyRingCache.
-export function redraw(canvas, ctx, solar, skyRingCache) {
+export function redraw(canvas, ctx, solar, skyRingCache, nowMin, t) {
   if (!solar) return skyRingCache;
   const sz = canvas.width;
   const cx = sz / 2, cy = sz / 2;
@@ -281,16 +282,16 @@ export function redraw(canvas, ctx, solar, skyRingCache) {
   // on small mobile screens by shrinking the ring just enough.
   const outerR = Math.min(cx * 0.865, cx - 24 - majorSz * 0.5);
   const innerR = cx * 0.525;
-  const t      = performance.now();
 
-  // Compute current time upfront (needed for background animation)
-  const now    = new Date();
-  const nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+  // Caller may pass pre-computed values to avoid duplicate work per frame.
+  const now = new Date();
+  if (t      === undefined) t      = performance.now();
+  if (nowMin === undefined) nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
 
   ctx.clearRect(0, 0, sz, sz);
 
   // Animated sky background across the full canvas
-  drawBackground(ctx, cx, cy, sz, nowMin, t, solar);
+  drawBackground(ctx, cx, cy, sz, sz, nowMin, t, solar);
 
   // Sky ring (static, cached)
   if (!skyRingCache) skyRingCache = buildSkyRing(solar, canvas);
