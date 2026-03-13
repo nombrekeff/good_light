@@ -376,9 +376,9 @@ export function redraw(canvas, ctx, solar, skyRingCache, nowMin, t) {
 
   // Current-time clock overlay in centre
   const centreR  = innerR * 0.92;
-  const hh       = String(now.getHours()).padStart(2, '0');
-  const mm       = String(now.getMinutes()).padStart(2, '0');
-  const timeStr  = `${hh}:${mm}`;
+  const dispH    = Math.floor(nowMin / 60) % 24;
+  const dispM    = Math.floor(nowMin % 60);
+  const timeStr  = `${String(dispH).padStart(2, '0')}:${String(dispM).padStart(2, '0')}`;
   const fontSize = Math.max(10, Math.round(centreR * 0.44)); // ~44% of centre radius
   ctx.save();
   ctx.textAlign    = 'center';

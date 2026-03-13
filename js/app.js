@@ -17,6 +17,8 @@ const tooltip = document.getElementById('ring-tooltip');
 let solar        = null;   // parsed solar data
 let skyRingCache = null;   // offscreen canvas for static ring
 let animId       = null;   // animation frame id
+let pinMins      = null;   // null = live current time; set while user drags the pin
+let isDragging   = false;  // true while a drag gesture is in progress
 
 // ── Canvas sizing ─────────────────────────────────────────
 function resize() {
@@ -53,33 +55,55 @@ function animate() {
   const now    = new Date();
   const nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
   const t      = performance.now();
-  skyRingCache = redraw(canvas, ctx, solar, skyRingCache, nowMin, t);
-  drawBgCanvas(nowMin, t);
-  updateUI(solar);
+  // Use the pinned time while the user is dragging; fall back to live current time.
+  const displayMins = pinMins !== null ? pinMins : nowMin;
+  skyRingCache = redraw(canvas, ctx, solar, skyRingCache, displayMins, t);
+  drawBgCanvas(displayMins, t);
+  updateUI(solar, displayMins);
   animId = requestAnimationFrame(animate);
+}
+
+// ── Pointer helpers ───────────────────────────────────────
+// Convert a viewport position to minutes (0-1440) on the ring.
+function ptrMins(clientX, clientY) {
+  const rect  = canvas.getBoundingClientRect();
+  const scale = canvas.width / rect.width;
+  const cx    = canvas.width / 2, cy = canvas.height / 2;
+  const dx    = (clientX - rect.left) * scale - cx;
+  const dy    = (clientY - rect.top)  * scale - cy;
+  let ang = Math.atan2(dy, dx) - RING_START;
+  if (ang < 0) ang += TAU;
+  return (ang / TAU) * 1440;
+}
+
+// Return true when the pointer falls on the ring band.
+function ptrOnRing(clientX, clientY) {
+  const rect   = canvas.getBoundingClientRect();
+  const scale  = canvas.width / rect.width;
+  const cx     = canvas.width / 2, cy = canvas.height / 2;
+  const dx     = (clientX - rect.left) * scale - cx;
+  const dy     = (clientY - rect.top)  * scale - cy;
+  const dist   = Math.hypot(dx, dy);
+  const outerR = cx * 0.865;
+  const innerR = cx * 0.525;
+  return dist >= innerR - 4 && dist <= outerR + 10;
 }
 
 // ── Ring tooltip on hover ─────────────────────────────────
 canvas.addEventListener('mousemove', (e) => {
   if (!solar) return;
-  const rect  = canvas.getBoundingClientRect();
-  const scale = canvas.width / rect.width;
-  const mx    = (e.clientX - rect.left) * scale;
-  const my    = (e.clientY - rect.top)  * scale;
-  const cx    = canvas.width / 2, cy = canvas.height / 2;
-  const dx    = mx - cx, dy = my - cy;
-  const dist  = Math.hypot(dx, dy);
-  const outerR = cx * 0.865;
-  const innerR = cx * 0.525;
+  // While dragging, tooltip is hidden — the centre already shows the time.
+  if (isDragging) return;
 
-  if (dist >= innerR - 4 && dist <= outerR + 10) {
-    let ang = Math.atan2(dy, dx) - RING_START;
-    if (ang < 0) ang += TAU;
-    const mins = (ang / TAU) * 1440;
+  const onRing = ptrOnRing(e.clientX, e.clientY);
+  canvas.style.cursor = onRing ? 'grab' : 'crosshair';
+
+  if (onRing) {
+    const mins = ptrMins(e.clientX, e.clientY);
     const h    = Math.floor(mins / 60);
     const mn   = String(Math.floor(mins % 60)).padStart(2, '0');
     const st   = getLightStatus(mins, solar);
-    tooltip.textContent  = `${String(h).padStart(2,'0')}:${mn}  ·  ${st.label}`;
+    tooltip.textContent   = `${String(h).padStart(2,'0')}:${mn}  ·  ${st.label}`;
     tooltip.style.display = 'block';
     tooltip.style.left    = `${e.clientX + 14}px`;
     tooltip.style.top     = `${e.clientY - 32}px`;
@@ -89,7 +113,58 @@ canvas.addEventListener('mousemove', (e) => {
 });
 
 canvas.addEventListener('mouseleave', () => {
-  tooltip.style.display = 'none';
+  if (!isDragging) {
+    tooltip.style.display = 'none';
+    canvas.style.cursor   = 'crosshair';
+  }
+});
+
+// ── Pin drag — mouse ──────────────────────────────────────
+canvas.addEventListener('mousedown', (e) => {
+  if (!solar || !ptrOnRing(e.clientX, e.clientY)) return;
+  isDragging             = true;
+  pinMins                = ptrMins(e.clientX, e.clientY);
+  canvas.style.cursor        = 'grabbing';
+  document.body.style.cursor = 'grabbing';
+  tooltip.style.display      = 'none';
+  e.preventDefault();
+});
+
+// Track the mouse across the whole window so fast drags don't lose the pin.
+window.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  pinMins = ptrMins(e.clientX, e.clientY);
+});
+
+window.addEventListener('mouseup', () => {
+  if (!isDragging) return;
+  isDragging                 = false;
+  pinMins                    = null;
+  canvas.style.cursor        = 'crosshair';
+  document.body.style.cursor = '';
+});
+
+// ── Pin drag — touch ──────────────────────────────────────
+canvas.addEventListener('touchstart', (e) => {
+  if (!solar || e.touches.length !== 1) return;
+  const t = e.touches[0];
+  if (!ptrOnRing(t.clientX, t.clientY)) return;
+  isDragging = true;
+  pinMins    = ptrMins(t.clientX, t.clientY);
+  e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener('touchmove', (e) => {
+  if (!isDragging || e.touches.length === 0) return;
+  const t = e.touches[0];
+  pinMins = ptrMins(t.clientX, t.clientY);
+  e.preventDefault();
+}, { passive: false });
+
+canvas.addEventListener('touchend', () => {
+  if (!isDragging) return;
+  isDragging = false;
+  pinMins    = null;
 });
 
 // ── Boot sequence ─────────────────────────────────────────
