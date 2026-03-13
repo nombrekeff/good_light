@@ -334,7 +334,7 @@ export function redraw(canvas, ctx, solar, skyRingCache) {
   ctx.textBaseline = 'middle';
   ctx.shadowColor  = 'rgba(0,0,0,0.7)';
   ctx.shadowBlur   = 10;
-  ctx.font         = `300 ${fontSize}px 'Cormorant Garamond', Georgia, serif`;
+  ctx.font         = `400 ${fontSize}px 'Playfair Display', Georgia, serif`;
   ctx.fillStyle    = 'rgba(255,255,255,0.82)';
   ctx.fillText(timeStr, cx, cy + centreR * 0.34); // lower third of centre circle
   ctx.restore();
