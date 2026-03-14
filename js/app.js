@@ -57,7 +57,7 @@ function animate() {
   const t      = performance.now();
   // Use the pinned time while the user is dragging; fall back to live current time.
   const displayMins = pinMins !== null ? pinMins : nowMin;
-  skyRingCache = redraw(canvas, ctx, solar, skyRingCache, displayMins, t, isDragging);
+  skyRingCache = redraw(canvas, ctx, solar, skyRingCache, displayMins, t);
   drawBgCanvas(displayMins, t);
   updateUI(solar, displayMins);
   animId = requestAnimationFrame(animate);
@@ -123,7 +123,7 @@ canvas.addEventListener('mouseleave', () => {
 canvas.addEventListener('mousedown', (e) => {
   if (!solar || !ptrOnRing(e.clientX, e.clientY)) return;
   isDragging             = true;
-  pinMins                = ptrMins(e.clientX, e.clientY);
+  pinMins                = (ptrMins(e.clientX, e.clientY) + 720) % 1440;
   canvas.style.cursor        = 'grabbing';
   document.body.style.cursor = 'grabbing';
   tooltip.style.display      = 'none';
@@ -133,7 +133,7 @@ canvas.addEventListener('mousedown', (e) => {
 // Track the mouse across the whole window so fast drags don't lose the pin.
 window.addEventListener('mousemove', (e) => {
   if (!isDragging) return;
-  pinMins = ptrMins(e.clientX, e.clientY);
+  pinMins = (ptrMins(e.clientX, e.clientY) + 720) % 1440;
 });
 
 window.addEventListener('mouseup', () => {
@@ -150,14 +150,14 @@ canvas.addEventListener('touchstart', (e) => {
   const t = e.touches[0];
   if (!ptrOnRing(t.clientX, t.clientY)) return;
   isDragging = true;
-  pinMins    = ptrMins(t.clientX, t.clientY);
+  pinMins    = (ptrMins(t.clientX, t.clientY) + 720) % 1440;
   e.preventDefault();
 }, { passive: false });
 
 canvas.addEventListener('touchmove', (e) => {
   if (!isDragging || e.touches.length === 0) return;
   const t = e.touches[0];
-  pinMins = ptrMins(t.clientX, t.clientY);
+  pinMins = (ptrMins(t.clientX, t.clientY) + 720) % 1440;
   e.preventDefault();
 }, { passive: false });
 
