@@ -16,6 +16,24 @@ export function fmtDur(startD, endD) {
   return fmtMins(mins);
 }
 
+function setTimeRange(id, startD, endD) {
+  const el = document.getElementById(id);
+  const start = document.createElement('span');
+  start.className = 'card-time-start';
+  start.textContent = fmtTime(startD);
+
+  const sep = document.createElement('span');
+  sep.className = 'card-time-sep';
+  sep.textContent = '—';
+  sep.setAttribute('aria-hidden', 'true');
+
+  const end = document.createElement('span');
+  end.className = 'card-time-end';
+  end.textContent = fmtTime(endD);
+
+  el.replaceChildren(start, sep, end);
+}
+
 // ── Toggle active state on a schedule card ────────────────
 export function setActive(id, type, active) {
   const el = document.getElementById(id);
@@ -56,24 +74,20 @@ export function populateCards(solar) {
   const goldPMstart = new Date(ssD.getTime() - 60 * 60000);
 
   // Blue-AM: civil begin → sunrise
-  document.getElementById('blue-am-time').textContent =
-    `${fmtTime(cbD)} – ${fmtTime(srD)}`;
+  setTimeRange('blue-am-time', cbD, srD);
   document.getElementById('blue-am-dur').textContent =
     fmtDur(cbD, srD);
 
   // Gold-AM: sunrise → sunrise+60 (golden hour is fixed at 60 min by definition)
-  document.getElementById('gold-am-time').textContent =
-    `${fmtTime(srD)} – ${fmtTime(goldAMend)}`;
+  setTimeRange('gold-am-time', srD, goldAMend);
   document.getElementById('gold-am-dur').textContent = '60 min';
 
   // Gold-PM: sunset-60 → sunset (golden hour is fixed at 60 min by definition)
-  document.getElementById('gold-pm-time').textContent =
-    `${fmtTime(goldPMstart)} – ${fmtTime(ssD)}`;
+  setTimeRange('gold-pm-time', goldPMstart, ssD);
   document.getElementById('gold-pm-dur').textContent = '60 min';
 
   // Blue-PM: sunset → civil end
-  document.getElementById('blue-pm-time').textContent =
-    `${fmtTime(ssD)} – ${fmtTime(ceD)}`;
+  setTimeRange('blue-pm-time', ssD, ceD);
   document.getElementById('blue-pm-dur').textContent =
     fmtDur(ssD, ceD);
 
