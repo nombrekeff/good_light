@@ -7,8 +7,8 @@
   --blue-hr:      #5880d0;
   --blue-light:   #88aae0;
   --text:         #ddd8cc;
-  --text-dim:     #7888a4;
-  --text-dimmer:  #5a6a88;
+  --text-dim:     #d8dfeb;
+  --text-dimmer:  #bec8d9;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -91,6 +91,7 @@ header { text-align: center; }
   text-transform: uppercase;
   color: var(--text-dim);
   margin-top: 7px;
+  text-shadow: 0 1px 3px rgba(7,12,24,0.6);
 }
 
 #location-name {
@@ -99,6 +100,7 @@ header { text-align: center; }
   margin-top: 8px;
   letter-spacing: 0.08em;
   min-height: 1em;
+  text-shadow: 0 1px 3px rgba(7,12,24,0.6);
 }
 
 /* ── Canvas ── */
@@ -140,14 +142,15 @@ header { text-align: center; }
 }
 #quality-label.golden    { color: var(--gold); }
 #quality-label.blue-hour { color: var(--blue-light); }
-#quality-label.day       { color: #90b8d8; }
-#quality-label.harsh     { color: #c8a090; }
-#quality-label.night     { color: var(--text-dimmer); }
+#quality-label.day       { color: #e7f1ff; }
+#quality-label.harsh     { color: #ffd3b6; }
+#quality-label.night     { color: #d4deee; }
 
 #sun-times {
   font-size: 0.62rem;
   color: var(--text-dim);
   letter-spacing: 0.12em;
+  text-shadow: 0 1px 3px rgba(7,12,24,0.6);
 }
 #next-event {
   font-size: 0.62rem;
@@ -155,6 +158,7 @@ header { text-align: center; }
   text-transform: uppercase;
   color: var(--text-dimmer);
   min-height: 1em;
+  text-shadow: 0 1px 3px rgba(7,12,24,0.6);
 }
 
 /* ── Schedule cards ── */
@@ -213,11 +217,35 @@ header { text-align: center; }
 .card-type   { font-size: 0.57rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500; }
 .card-type.gold { color: var(--gold); }
 .card-type.blue { color: var(--blue-light); }
-.card-time   { font-family: 'Playfair Display', serif; font-size: clamp(0.65rem, 2vw, 0.92rem); letter-spacing: 0.04em; color: var(--text); }
+.card-time   {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(0.65rem, 2vw, 0.92rem);
+  letter-spacing: 0.04em;
+  color: var(--text);
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: 0.24em;
+  text-align: center;
+}
+.card-time-start, .card-time-end, .card-time-sep { white-space: nowrap; }
 .card-dur    { font-size: 0.56rem; color: var(--text-dimmer); }
 
 /* ── Footer ── */
 footer { font-size: 0.58rem; letter-spacing: 0.1em; color: var(--text-dimmer); opacity: 0.5; text-align: center; }
+
+@media (min-width: 720px) {
+  .schedule {
+    max-width: 640px;
+    gap: 14px;
+  }
+
+  .card {
+    padding: 18px 14px 16px;
+    gap: 7px;
+  }
+}
 
 /* ── Error banner ── */
 #error-banner {
