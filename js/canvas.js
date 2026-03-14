@@ -273,7 +273,7 @@ export function drawBackground(ctx, cx, cy, w, h, nowMin, t, solar) {
 
 // ── Main draw function ────────────────────────────────────
 // Returns the (potentially newly built) skyRingCache.
-export function redraw(canvas, ctx, solar, skyRingCache, nowMin, t) {
+export function redraw(canvas, ctx, solar, skyRingCache, nowMin, t, isDragging) {
   if (!solar) return skyRingCache;
   const sz = canvas.width;
   const cx = sz / 2, cy = sz / 2;
@@ -342,10 +342,13 @@ export function redraw(canvas, ctx, solar, skyRingCache, nowMin, t) {
   }
 
   // Current-time needle + dot
+  // While dragging, place the needle on the opposite side of the ring so it
+  // isn't hidden under the user's thumb/cursor.
   const nowAng = RING_START + (nowMin / 1440) * TAU;
+  const needleAng = isDragging ? nowAng + Math.PI : nowAng;
   const dotR   = (outerR + innerR) / 2;
-  const dotX   = cx + dotR * Math.cos(nowAng);
-  const dotY   = cy + dotR * Math.sin(nowAng);
+  const dotX   = cx + dotR * Math.cos(needleAng);
+  const dotY   = cy + dotR * Math.sin(needleAng);
 
   // Thin needle from centre
   ctx.beginPath();
